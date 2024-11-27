@@ -1,3 +1,3 @@
 npm i
 npx tsc
-node dist/index.js
+node --experimental-wasm-modules dist/index.js post tester

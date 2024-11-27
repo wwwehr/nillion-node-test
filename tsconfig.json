@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext", // Use ES Modules
+    "moduleResolution": "nodenext", // Use Node.js ESM resolution
+    "target": "ES2020", // Ensure modern JS features
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

@@ -30,7 +30,11 @@ config({ path: envPath });
 
 // import type { VmClient } from "@nillion/client-vms";
 import { NadaValue } from "@nillion/client-vms";
-import { ValuesPermissionsBuilder } from "@nillion/client-vms/types/values-permissions";
+
+
+// BROKEN! how do I import this member?
+// import { ValuesPermissionsBuilder } from "@nillion/client-vms/types/values-permissions";
+
 import { createClient } from "@nillion/client-react-hooks";
 
 // Define the CLI commands
@@ -62,7 +66,8 @@ yargs(hideBin(process.argv))
             "myname",
             NadaValue.new_secret_blob(Uint8Array.from(fileBuffer)),
           )
-          .permissions(ValuesPermissionsBuilder.grantCompute())
+          // BROKEN! how do I import and use this?
+          // .permissions(ValuesPermissionsBuilder.grantCompute())
           .build()
           .invoke();
         console.log(chalk.green(JSON.stringify({ id }, null, 4)));

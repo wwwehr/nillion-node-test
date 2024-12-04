@@ -13,12 +13,12 @@ import { join } from "path";
 const envPath = join(homedir(), ".config/nillion/nillion-devnet.env");
 config({ path: envPath });
 
-import { NadaValue } from "@nillion/client-vms";
+//import { NadaValue } from "@nillion/client-vms";
 import { createClient } from "@nillion/client-react-hooks";
-
 
 // BROKEN! how do I import this member?
 // import { ValuesPermissionsBuilder } from "@nillion/client-vms/types/values-permissions";
+import { NadaValue, ValuesPermissionsBuilder } from "@nillion/client-vms";
 
 yargs(hideBin(process.argv))
   .scriptName("verida-poster")
@@ -48,8 +48,8 @@ yargs(hideBin(process.argv))
             "myname",
             NadaValue.new_secret_blob(Uint8Array.from(fileBuffer)),
           )
-          // BROKEN! how do I import and use this?
-          // .permissions(ValuesPermissionsBuilder.grantCompute())
+          .permissions(ValuesPermissionsBuilder.default(client.id))
+          .grantCompute()
           .build()
           .invoke();
         console.log(chalk.green(JSON.stringify({ id }, null, 4)));

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022", // Adjust the target based on the Node.js version you are using
-    "module": "NodeNext", // Use NodeNext for better alignment with Node.js module resolution
-    "moduleResolution": "NodeNext", // Use NodeNext module resolution strategy
+    "module": "ES2022", // Use NodeNext for better alignment with Node.js module resolution
+    "moduleResolution": "bundler", // Use NodeNext module resolution strategy
     "strict": true, // Enable all strict type-checking options
     "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules
     "skipLibCheck": true, // Skip type checking of declaration files

@@ -49,7 +49,7 @@ yargs(hideBin(process.argv))
             NadaValue.new_secret_blob(Uint8Array.from(fileBuffer)),
           )
           .permissions(ValuesPermissionsBuilder.default(client.id))
-          .grantCompute()
+          // .grantCompute(client.id, "")
           .build()
           .invoke();
         console.log(chalk.green(JSON.stringify({ id }, null, 4)));

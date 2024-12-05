@@ -2,31 +2,52 @@
   description = "Development environment for Nillion & Node.js 23";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
-    nixpkgs.inputs.from = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
   };
 
   outputs = { self, nixpkgs }:
     let
-      pkgs = import nixpkgs {
-        system = "x86_64-linux"; # Adjust to your architecture
-      };
+      supportedSystems = [
+        "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
+
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
-      devShell = pkgs.mkShell {
-        name = "node23-dev-env";
-        buildInputs = [
-          pkgs.nodejs-23_x
-          pkgs.yarn
-          pkgs.git
-          pkgs.npm
-        ];
+      packages = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          j2_render = pkgs.callPackage ./nix/packages/j2_render { };
+        }
+      );
 
-        shellHook = ''
-          echo "Welcome to Nillion node environment!"
-          echo "Node.js version: $(node -v)"
-        '';
-      };
+      devShells = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              nodejs
+              yarn
+              git
+              pnpm
+              zsh
+            ];
+
+            shellHook = ''
+              export PROMPT="%F{cyan}%n@devShell%f:%F{yellow}%~%f%# " # Custom prompt directly
+              export SHELL=$(which zsh)                              # Set Zsh as the shell
+              exec $SHELL --no-rcs --no-globalrcs
+            '';
+          };
+        }
+      );
     };
 }
 

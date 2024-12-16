@@ -13,27 +13,32 @@ import { join } from "path";
 const envPath = join(homedir(), ".config/nillion/nillion-devnet.env");
 config({ path: envPath });
 
-//import { NadaValue } from "@nillion/client-vms";
 import { createClient } from "@nillion/client-react-hooks";
 
-// BROKEN! how do I import this member?
-// import { ValuesPermissionsBuilder } from "@nillion/client-vms/types/values-permissions";
-import { NadaValue, ValuesPermissionsBuilder } from "@nillion/client-vms";
+import {
+  NadaValue,
+  UserId,
+  ValuesPermissionsBuilder,
+} from "@nillion/client-vms";
 
 yargs(hideBin(process.argv))
-  .scriptName("verida-poster")
+  .scriptName("nilvm-nodejs-example")
   .usage("$0 <command> [options]")
   .command(
-    "post <path>",
-    "post a secret to nillion",
+    "upload <path> [userid]",
+    "Upload a file to nilVM, optionally give permissions to another party to read it",
     (yargs: Argv) => {
       return yargs.positional("path", {
         describe: "path to file",
         type: "string",
         demandOption: true,
-      });
+      })
+        .positional("userid", {
+          describe: "User ID to share file with",
+          type: "string",
+        });
     },
-    (argv: { path: string }) => {
+    (argv: { path: string; userid?: string }) => {
       const init = async () => {
         console.log(chalk.yellow(`devnet: ${process.env.NILLION_CLUSTER_ID}`));
         const fileBuffer = await fsPromises.readFile(argv.path); // Read file as a Buffer
@@ -41,6 +46,15 @@ yargs(hideBin(process.argv))
         const client = await createClient({
           network: "devnet",
         });
+
+        let permissions = ValuesPermissionsBuilder.default(client.id);
+        if (argv.userid) {
+          console.log(`Enable retrieve for user: ${argv.userid}`);
+          const other = new UserId(Buffer.from(argv.userid, "hex"));
+          permissions = ValuesPermissionsBuilder.init().owner(client.id)
+            .grantRetrieve(other).build();
+        }
+
         const id = await client
           .storeValues()
           .ttl(1)
@@ -48,8 +62,7 @@ yargs(hideBin(process.argv))
             "myname",
             NadaValue.new_secret_blob(Uint8Array.from(fileBuffer)),
           )
-          .permissions(ValuesPermissionsBuilder.default(client.id))
-          // .grantCompute(client.id, "")
+          .permissions(permissions)
           .build()
           .invoke();
         console.log(chalk.green(JSON.stringify({ id }, null, 4)));
